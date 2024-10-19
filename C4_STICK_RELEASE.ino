@@ -8,6 +8,7 @@ int minDelay = 50;
 int fastBeepDelay = 100;
 bool isBombActive = false;
 bool isBombDefused = false;
+unsigned long bombStartTime = 0;
 unsigned long buttonPressStart = 0;
 bool isButtonPressed = false;
 int defuseTime = 5000;
@@ -17,6 +18,7 @@ void resetBombState() {
   isBombDefused = false;
   buttonPressStart = 0;
   isButtonPressed = false;
+  bombStartTime = 0;
   StickCP2.Display.setTextColor(GREEN);
   StickCP2.Display.setTextSize(1);
   StickCP2.Display.fillScreen(BLACK);
@@ -24,7 +26,7 @@ void resetBombState() {
                               StickCP2.Display.height() / 2);
   StickCP2.Display.setTextSize(0.7);
   StickCP2.Display.drawString("By Shlappa", StickCP2.Display.width() / 2,
-                              StickCP2.Display.height() / 1.35);
+                                StickCP2.Display.height() / 1.35);
   StickCP2.Display.setTextSize(1);
 }
 
@@ -43,20 +45,41 @@ void setup() {
 void loop() {
   StickCP2.update();
 
+  if (StickCP2.BtnB.wasPressed()) {
+    resetBombState();
+    return;
+  }
+
   if (!isBombActive && StickCP2.BtnA.wasPressed()) {
     isBombActive = true;
     isBombDefused = false;
+    bombStartTime = millis();
     int remainingTime = totalDuration;
     int initialDelay = totalDuration / count;
 
     for (int i = 0; i < count; i++) {
       StickCP2.update();
 
-      if (StickCP2.BtnA.isPressed()) {
+      if (StickCP2.BtnB.wasPressed()) {
+        resetBombState();
+        return;
+      }
+
+      unsigned long bombActiveDuration = millis() - bombStartTime;
+      bool canDefuse = bombActiveDuration > 1000;
+
+      if (StickCP2.BtnA.isPressed() && canDefuse) {
         if (!isButtonPressed) {
           buttonPressStart = millis();
           isButtonPressed = true;
         }
+
+        StickCP2.Display.fillScreen(BLACK);
+        StickCP2.Display.setCursor(10, 10);
+        StickCP2.Display.setTextColor(BLUE);
+        StickCP2.Display.setTextSize(1.5);
+        StickCP2.Display.drawString("Defusing...", StickCP2.Display.width() / 2,
+                                    StickCP2.Display.height() / 2);
 
         if (millis() - buttonPressStart > defuseTime) {
           isBombDefused = true;
@@ -66,6 +89,11 @@ void loop() {
           StickCP2.Display.setTextSize(1.5);
           StickCP2.Display.drawString("Defused!", StickCP2.Display.width() / 2,
                                       StickCP2.Display.height() / 2);
+          tone(BUZZER_PIN, 400, 100);
+          delay(200);
+          tone(BUZZER_PIN, 400, 100);
+          delay(200);
+          tone(BUZZER_PIN, 400, 100);
           noTone(BUZZER_PIN);
           delay(5000);
           resetBombState();
@@ -74,6 +102,12 @@ void loop() {
       } else {
         isButtonPressed = false;
         buttonPressStart = 0;
+
+        StickCP2.Display.fillScreen(BLACK);
+        StickCP2.Display.setCursor(10, 10);
+        StickCP2.Display.setTextColor(GREEN);
+        StickCP2.Display.drawString(String(count - i), StickCP2.Display.width() / 2,
+                                    StickCP2.Display.height() / 2);
       }
 
       if (isBombDefused) {
@@ -82,7 +116,6 @@ void loop() {
 
       tone(BUZZER_PIN, 900, 200);
       delay(200);
-
       noTone(BUZZER_PIN);
 
       int timeDelay;
@@ -96,11 +129,6 @@ void loop() {
       delay(timeDelay);
 
       remainingTime -= (timeDelay + 200);
-
-      StickCP2.Display.fillScreen(BLACK);
-      StickCP2.Display.setCursor(10, 10);
-      StickCP2.Display.drawString(String(count - i), StickCP2.Display.width() / 2,
-                                  StickCP2.Display.height() / 2);
     }
 
     if (!isBombDefused) {
