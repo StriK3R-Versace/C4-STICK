@@ -22,11 +22,9 @@ void resetBombState() {
   StickCP2.Display.setTextColor(GREEN);
   StickCP2.Display.setTextSize(1);
   StickCP2.Display.fillScreen(BLACK);
-  StickCP2.Display.drawString("C4", StickCP2.Display.width() / 2,
-                              StickCP2.Display.height() / 2);
+  StickCP2.Display.drawString("C4", StickCP2.Display.width() / 2, StickCP2.Display.height() / 2);
   StickCP2.Display.setTextSize(0.7);
-  StickCP2.Display.drawString("By Shlappa", StickCP2.Display.width() / 2,
-                                StickCP2.Display.height() / 1.35);
+  StickCP2.Display.drawString("By Shlappa", StickCP2.Display.width() / 2, StickCP2.Display.height() / 1.35);
   StickCP2.Display.setTextSize(1);
 }
 
@@ -44,7 +42,7 @@ void setup() {
 
 void loop() {
   StickCP2.update();
-
+  
   if (StickCP2.BtnB.wasPressed()) {
     resetBombState();
     return;
@@ -78,8 +76,7 @@ void loop() {
         StickCP2.Display.setCursor(10, 10);
         StickCP2.Display.setTextColor(BLUE);
         StickCP2.Display.setTextSize(1.5);
-        StickCP2.Display.drawString("Defusing...", StickCP2.Display.width() / 2,
-                                    StickCP2.Display.height() / 2);
+        StickCP2.Display.drawString("Defusing...", StickCP2.Display.width() / 2, StickCP2.Display.height() / 2);
 
         if (millis() - buttonPressStart > defuseTime) {
           isBombDefused = true;
@@ -87,8 +84,7 @@ void loop() {
           StickCP2.Display.setCursor(10, 10);
           StickCP2.Display.setTextColor(BLUE);
           StickCP2.Display.setTextSize(1.5);
-          StickCP2.Display.drawString("Defused!", StickCP2.Display.width() / 2,
-                                      StickCP2.Display.height() / 2);
+          StickCP2.Display.drawString("Defused!", StickCP2.Display.width() / 2, StickCP2.Display.height() / 2);
           tone(BUZZER_PIN, 400, 100);
           delay(200);
           tone(BUZZER_PIN, 400, 100);
@@ -106,8 +102,7 @@ void loop() {
         StickCP2.Display.fillScreen(BLACK);
         StickCP2.Display.setCursor(10, 10);
         StickCP2.Display.setTextColor(GREEN);
-        StickCP2.Display.drawString(String(count - i), StickCP2.Display.width() / 2,
-                                    StickCP2.Display.height() / 2);
+        StickCP2.Display.drawString(String(count - i), StickCP2.Display.width() / 2, StickCP2.Display.height() / 2);
       }
 
       if (isBombDefused) {
@@ -116,6 +111,7 @@ void loop() {
 
       tone(BUZZER_PIN, 900, 200);
       delay(200);
+
       noTone(BUZZER_PIN);
 
       int timeDelay;
@@ -127,13 +123,14 @@ void loop() {
       }
 
       delay(timeDelay);
-
       remainingTime -= (timeDelay + 200);
     }
 
     if (!isBombDefused) {
+      StickCP2.Power.setLed(10);
       tone(BUZZER_PIN, 1000, 1000);
-      delay(1000);
+      delay(1500);
+      StickCP2.Power.setLed(0);
       tone(BUZZER_PIN, 700, 1000);
       delay(1000);
       noTone(BUZZER_PIN);
