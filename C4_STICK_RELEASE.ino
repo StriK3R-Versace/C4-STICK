@@ -3,7 +3,7 @@
 #define BUZZER_PIN 2
 
 int totalDuration = 50000;
-int count = 61;
+int count = 60;
 int minDelay = 50;
 int fastBeepDelay = 100;
 bool isBombActive = false;
@@ -24,7 +24,7 @@ void resetBombState() {
   StickCP2.Display.fillScreen(BLACK);
   StickCP2.Display.drawString("C4", StickCP2.Display.width() / 2, StickCP2.Display.height() / 2);
   StickCP2.Display.setTextSize(0.7);
-  StickCP2.Display.drawString("By Shlappa", StickCP2.Display.width() / 2, StickCP2.Display.height() / 1.35);
+  StickCP2.Display.drawString("By StriK3R", StickCP2.Display.width() / 2, StickCP2.Display.height() / 1.35);
   StickCP2.Display.setTextSize(1);
 }
 
